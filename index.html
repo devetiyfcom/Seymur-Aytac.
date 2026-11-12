@@ -256,7 +256,7 @@
 </div></div>
 
 <div id="music" title="Musiqi"><svg viewBox="0 0 24 24"><path d="M12 3v10.6A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
-<audio id="aud" src="music.mp3" loop preload="auto"></audio>
+<audio id="aud" loop preload="auto"></audio>
 
 <script>
 (function(){
@@ -281,7 +281,12 @@
 
   // musiqi (music.mp3 varsa düymə görünür)
   var aud=document.getElementById('aud'), mb=document.getElementById('music');
-  aud.addEventListener('canplay',function(){mb.classList.add('show')},{once:true});
+  // musiqi: Almaz & Aydın dəvətnaməsindəki mp3 (tapılmasa növbəti ünvan yoxlanır)
+  var SONGS=['musiqi.mp3','music.mp3','https://devetiyfcom.github.io/AA/musiqi.mp3','https://devetiyfcom.github.io/AA/music.mp3'], si=0;
+  aud.addEventListener('error',function(){ if(++si<SONGS.length){aud.src=SONGS[si];aud.load()} });
+  aud.src=SONGS[0];
+  var wantPlay=false;
+  aud.addEventListener('canplay',function(){mb.classList.add('show'); if(wantPlay&&aud.paused){aud.play().then(function(){mb.classList.add('playing')}).catch(function(){})}},{once:true});
   mb.addEventListener('click',function(){
     if(aud.paused){aud.play();mb.classList.add('playing')}else{aud.pause();mb.classList.remove('playing')}
   });
@@ -289,7 +294,7 @@
   var intro=document.getElementById('intro'), started=false;
   intro.addEventListener('click',function(){
     if(started) return; started=true;
-    aud.play().then(function(){mb.classList.add('playing')}).catch(function(){});
+    wantPlay=true; aud.play().then(function(){mb.classList.add('playing')}).catch(function(){});
     document.getElementById('tap').style.opacity=0;
     stage.style.transform='scale(1.45)';               // kamera saraya yaxınlaşır
     setTimeout(function(){
